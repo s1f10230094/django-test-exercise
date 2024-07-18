@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import Http404
+from django.utils import timezone
 from django.utils.timezone import make_aware
 from django.utils.dateparse import parse_datetime
 from todo.models import Task
@@ -68,5 +69,6 @@ def close(request, task_id):
     except Task.DoesNotExist:
         raise Http404('Task does not exist')
     task.completed = True
+    task.completed_at = timezone.now()
     task.save()
     return redirect(index)
