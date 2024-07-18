@@ -113,3 +113,33 @@ class TodoViewTestCase(TestCase):
         response = client.get('/1/')
 
         self.assertEqual(response.status_code, 404)
+
+    def test_update_view_get(self):
+        task = Task(title='task1', due_at=timezone.make_aware(datetime(2024, 7, 1)))
+        task.save()
+        client = Client()
+        response = client.get('/{}/update'.format(task.pk))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.templates[0].name, 'todo/edit.html')
+        self.assertEqual(response.context['task'], task)
+
+    def test_update_view_post_data(self):
+        task = Task(title='task1', due_at=timezone.make_aware(datetime(2024, 7, 1)))
+        task.save()
+        client = Client()
+        new_title = 'New task1'
+        new_due_at = '2024-06-30 23:59:59'
+        data = {'title': new_title, 'due_at': new_due_at}
+        response = client.post('/{}/update'.format(task.pk), data)
+        new_task = Task.objects.get(pk=task.pk)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(new_task.title, new_title)
+        self.assertEqual(new_task.due_at, timezone.make_aware(datetime(2024, 6, 30, 23, 59, 59)))
+
+    def test_update_get_fail(self):
+        client = Client()
+        responce = client.get('/1/update')
+
+        self.assertEqual(responce.status_code, 404)
