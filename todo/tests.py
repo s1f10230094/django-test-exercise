@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime, timedelta
 from todo.models import Task
 
 
@@ -120,8 +120,12 @@ class TodoViewTestCase(TestCase):
         client = Client()
         response = client.get('/1/close')
         response = client.get('/')
+        task.refresh_from_db()
+        now = timezone.now()
 
-        self.assertTrue(response.context['tasks'][0].completed)
+        self.assertTrue(task.completed)
+        self.assertLessEqual(task.completed_at, now)
+        self.assertGreaterEqual(task.completed_at, now - timedelta(seconds=1))
 
     def test_close_get(self):
         task = Task(title='task1', due_at=timezone.make_aware(datetime(2024, 7, 1)))
