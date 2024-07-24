@@ -6,6 +6,12 @@
     <title>To Do Application</title>
     <meta charset="UTF-8">
     <meta name="author" content="INIAD">
+
+    <script type="text/javascript">
+      function confirmLink() {
+        return confirm("本当にこのtaskをdeleteしますか？");
+      }
+    </script>
   </head>
 
   <body>
@@ -25,7 +31,7 @@
     <div>
       <a href="{% url 'index' %}">Top</a>
       <a href="{% url 'update' task.id %}">Edit</a>
-      <a href="{% url 'delete' task.id %}">Delete</a>
+      <a href="{% url 'delete' task.id %}" onClick="return confirmLink();">Delete</a>
       <a href="{% url 'close' task.id %}">Close</a>
     </div>
   </body>
