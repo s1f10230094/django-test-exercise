@@ -138,9 +138,24 @@ class TodoViewTestCase(TestCase):
         self.assertEqual(new_task.title, new_title)
         self.assertEqual(new_task.due_at, timezone.make_aware(datetime(2024, 6, 30, 23, 59, 59)))
 
+    def test_update_view_redirect_to_detail(self):
+        task = Task(title='task1', due_at=timezone.make_aware(datetime(2024, 7, 1)))
+        task.save()
+        client = Client()
+        response = client.get('/{}/update'.format(task.pk))
+        back_link = '/{}/'.format(task.pk)
+        response = client.get(back_link)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.templates[0].name, 'todo/detail.html')
+        self.assertEqual(response.context['task'], task)
+        
     def test_update_get_fail(self):
         client = Client()
-        responce = client.get('/1/update')
+        response = client.get('/1/update')
+
+        self.assertEqual(response.status_code, 404)
+    
     def test_close(self):
         task = Task(title='task1', due_at=timezone.make_aware(datetime(2024, 7, 1)))
         task.save()
